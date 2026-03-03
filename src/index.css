@@ -4,89 +4,53 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 222 20% 6%;
+    --foreground: 45 60% 88%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 225 18% 9%;
+    --card-foreground: 45 60% 88%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 225 18% 9%;
+    --popover-foreground: 45 60% 88%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 42 78% 58%;
+    --primary-foreground: 222 20% 6%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 225 18% 14%;
+    --secondary-foreground: 45 60% 88%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 225 18% 14%;
+    --muted-foreground: 45 20% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 60% 65%;
+    --accent-foreground: 222 20% 6%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 45 60% 88%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 225 18% 18%;
+    --input: 225 18% 14%;
+    --ring: 42 78% 58%;
 
-    --radius: 0.5rem;
+    --radius: 0.25rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Цвета измерений */
+    --astria: 180 65% 55%;
+    --cybern: 210 90% 60%;
+    --necropolis: 270 60% 55%;
+    --edemia: 120 55% 45%;
+    --pustosh: 0 0% 35%;
+    --gold: 42 78% 58%;
+    --sapphire: 220 75% 55%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 225 18% 7%;
+    --sidebar-foreground: 45 40% 75%;
+    --sidebar-primary: 42 78% 58%;
+    --sidebar-primary-foreground: 222 20% 6%;
+    --sidebar-accent: 225 18% 14%;
+    --sidebar-accent-foreground: 45 60% 88%;
+    --sidebar-border: 225 18% 15%;
+    --sidebar-ring: 42 78% 58%;
   }
 }
 
@@ -97,5 +61,415 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: "Golos Text", sans-serif;
+    overflow-x: hidden;
   }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Cormorant Garamond", serif;
+  }
+}
+
+/* Магические рамки измерений */
+.border-astria {
+  border-color: hsl(var(--astria));
+  box-shadow: 0 0 12px hsl(var(--astria) / 0.25);
+}
+.border-cybern {
+  border-color: hsl(var(--cybern));
+  box-shadow: 0 0 12px hsl(var(--cybern) / 0.25);
+}
+.border-necropolis {
+  border-color: hsl(var(--necropolis));
+  box-shadow: 0 0 12px hsl(var(--necropolis) / 0.25);
+}
+.border-edemia {
+  border-color: hsl(var(--edemia));
+  box-shadow: 0 0 12px hsl(var(--edemia) / 0.25);
+}
+.border-pustosh {
+  border-color: hsl(var(--pustosh));
+  box-shadow: 0 0 12px hsl(var(--pustosh) / 0.25);
+}
+
+/* Фоны измерений */
+.bg-astria-dim {
+  background: hsl(var(--astria) / 0.08);
+}
+.bg-cybern-dim {
+  background: hsl(var(--cybern) / 0.08);
+}
+.bg-necropolis-dim {
+  background: hsl(var(--necropolis) / 0.08);
+}
+.bg-edemia-dim {
+  background: hsl(var(--edemia) / 0.08);
+}
+.bg-pustosh-dim {
+  background: hsl(var(--pustosh) / 0.08);
+}
+
+/* Магическая рамка золото */
+.magic-border {
+  position: relative;
+  border: 1px solid hsl(var(--gold) / 0.35);
+}
+.magic-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--gold) / 0.5),
+    transparent,
+    hsl(var(--sapphire) / 0.3),
+    transparent,
+    hsl(var(--gold) / 0.5)
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.magic-border::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  border: 1px solid hsl(var(--gold) / 0.12);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Рамка угловые орнаменты */
+.ornament-border {
+  position: relative;
+  border: 1px solid hsl(var(--gold) / 0.3);
+}
+.ornament-border::before {
+  content: "✦";
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  color: hsl(var(--gold));
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Текстура фона лабиринта */
+.labyrinth-bg {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(
+      ellipse at 20% 20%,
+      hsl(var(--astria) / 0.04) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 80%,
+      hsl(var(--necropolis) / 0.05) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 50% 0%,
+      hsl(var(--gold) / 0.03) 0%,
+      transparent 40%
+    );
+}
+
+/* Текст с золотым свечением */
+.text-glow-gold {
+  color: hsl(var(--gold));
+  text-shadow:
+    0 0 20px hsl(var(--gold) / 0.4),
+    0 0 40px hsl(var(--gold) / 0.15);
+}
+.text-glow-sapphire {
+  color: hsl(var(--sapphire));
+  text-shadow: 0 0 20px hsl(var(--sapphire) / 0.4);
+}
+.text-glow-astria {
+  color: hsl(var(--astria));
+}
+.text-glow-cybern {
+  color: hsl(var(--cybern));
+}
+.text-glow-necropolis {
+  color: hsl(var(--necropolis));
+}
+.text-glow-edemia {
+  color: hsl(var(--edemia));
+}
+.text-glow-pustosh {
+  color: hsl(var(--pustosh));
+}
+
+/* Анимации */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+@keyframes rune-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes moons {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+.animate-moons {
+  animation: moons 3s ease-in-out infinite;
+}
+
+/* Задержки анимаций */
+.delay-100 {
+  animation-delay: 0.1s;
+}
+.delay-200 {
+  animation-delay: 0.2s;
+}
+.delay-300 {
+  animation-delay: 0.3s;
+}
+.delay-400 {
+  animation-delay: 0.4s;
+}
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+/* Полоса здоровья/маны */
+.hp-bar {
+  height: 6px;
+  background: hsl(225 18% 14%);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.hp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, hsl(0 60% 40%), hsl(0 75% 55%));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.mp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, hsl(220 60% 40%), hsl(220 80% 65%));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, hsl(42 60% 40%), hsl(42 78% 65%));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Кнопки выборов в квестах */
+.choice-btn {
+  position: relative;
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  border: 1px solid hsl(var(--gold) / 0.25);
+  background: hsl(225 18% 9%);
+  color: hsl(var(--foreground));
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Golos Text", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.choice-btn:hover {
+  border-color: hsl(var(--gold) / 0.6);
+  background: hsl(225 18% 12%);
+  box-shadow: 0 0 15px hsl(var(--gold) / 0.1);
+  padding-left: 24px;
+}
+.choice-btn::before {
+  content: "◆";
+  color: hsl(var(--gold) / 0.4);
+  margin-right: 8px;
+  font-size: 8px;
+  transition: color 0.2s;
+}
+.choice-btn:hover::before {
+  color: hsl(var(--gold));
+}
+
+/* Скролл */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(225 18% 9%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--gold) / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--gold) / 0.5);
+}
+
+/* Навигационные элементы */
+.nav-item {
+  position: relative;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 13px;
+  color: hsl(45 20% 55%);
+  font-family: "Golos Text", sans-serif;
+  letter-spacing: 0.05em;
+}
+.nav-item:hover {
+  color: hsl(var(--gold));
+  background: hsl(var(--gold) / 0.06);
+}
+.nav-item.active {
+  color: hsl(var(--gold));
+  background: hsl(var(--gold) / 0.1);
+}
+.nav-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: hsl(var(--gold) / 0.6);
+}
+
+/* Карточки персонажей */
+.char-card {
+  position: relative;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  border-radius: 6px;
+  padding: 16px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+.char-card:hover {
+  border-color: hsl(var(--gold) / 0.5);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 25px hsl(0 0% 0% / 0.4),
+    0 0 20px hsl(var(--gold) / 0.08);
+}
+
+/* Стеклянный эффект */
+.glass {
+  background: hsl(225 18% 9% / 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--gold) / 0.15);
+}
+
+/* Разделитель с орнаментом */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: hsl(var(--gold) / 0.4);
+  font-size: 12px;
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--gold) / 0.3),
+    transparent
+  );
+}
+
+/* Бейджи измерений */
+.badge-dimension {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: "Golos Text", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
 }
