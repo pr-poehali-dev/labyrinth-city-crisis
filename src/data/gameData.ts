@@ -168,6 +168,170 @@ export const OPENING_SCENES: Scene[] = [
   },
 ];
 
+export interface MysticForm {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  emoji: string;
+  dimension: Dimension | 'divine';
+  mpCost: number;
+  bonuses: { hp?: number; mp?: number; strength?: number; magic?: number };
+  regenRate: number;
+  regenType: 'hp' | 'mp' | 'both';
+}
+
+export interface FusionForm {
+  id: string;
+  name: string;
+  description: string;
+  requiredForms: string[];
+  color: string;
+  gradient: string;
+  emoji: string;
+  mpCost: number;
+  bonuses: { hp?: number; mp?: number; strength?: number; magic?: number };
+  regenRate: number;
+  isUltimate?: boolean;
+}
+
+export const KATYA_FORMS: MysticForm[] = [
+  {
+    id: 'dragon-sky',
+    name: 'Небесный Дракон',
+    description: 'Первозданная форма — величественный дракон небес с золотой чешуёй. Регенерирует жизнь каждые несколько секунд.',
+    color: 'hsl(42 78% 58%)',
+    emoji: '🐉',
+    dimension: 'astria',
+    mpCost: 50,
+    bonuses: { strength: 30, hp: 2000 },
+    regenRate: 150,
+    regenType: 'hp',
+  },
+  {
+    id: 'qilin',
+    name: 'Цилинь',
+    description: 'Священное существо, несущее мир. Мощная регенерация духовной силы, исцеляет союзников.',
+    color: 'hsl(120 55% 50%)',
+    emoji: '🦄',
+    dimension: 'edemia',
+    mpCost: 40,
+    bonuses: { magic: 25, mp: 1500 },
+    regenRate: 200,
+    regenType: 'mp',
+  },
+  {
+    id: 'phoenix-sun',
+    name: 'Феникс Солнца',
+    description: 'Птица возрождения. При смерти — автоматически воскрешает с 50% жизни.',
+    color: 'hsl(25 90% 55%)',
+    emoji: '🔥',
+    dimension: 'astria',
+    mpCost: 60,
+    bonuses: { hp: 3000, magic: 20 },
+    regenRate: 100,
+    regenType: 'both',
+  },
+  {
+    id: 'phoenix-moon',
+    name: 'Феникс Луны',
+    description: 'Лунная птица теней. Восстанавливает силу духа в бою, неуязвима для тёмной магии.',
+    color: 'hsl(240 60% 65%)',
+    emoji: '🌙',
+    dimension: 'necropolis',
+    mpCost: 45,
+    bonuses: { mp: 2000, magic: 30 },
+    regenRate: 180,
+    regenType: 'mp',
+  },
+  {
+    id: 'phoenix-storm',
+    name: 'Феникс Бури',
+    description: 'Повелитель молний и вихрей. Высокая атака, средняя регенерация жизни.',
+    color: 'hsl(55 85% 55%)',
+    emoji: '⚡',
+    dimension: 'astria',
+    mpCost: 55,
+    bonuses: { strength: 40, hp: 1000 },
+    regenRate: 80,
+    regenType: 'hp',
+  },
+  {
+    id: 'phoenix-void',
+    name: 'Феникс Пустоши',
+    description: 'Птица пустоты, поглощающая хаос. Превращает урон в восстановление силы духа.',
+    color: 'hsl(0 0% 50%)',
+    emoji: '🕳️',
+    dimension: 'pustosh',
+    mpCost: 70,
+    bonuses: { magic: 45, mp: 2500 },
+    regenRate: 250,
+    regenType: 'mp',
+  },
+  {
+    id: 'phoenix-life',
+    name: 'Феникс Жизни',
+    description: 'Птица вечного возрождения. Непрерывная регенерация жизни и духа одновременно.',
+    color: 'hsl(150 65% 50%)',
+    emoji: '🌿',
+    dimension: 'edemia',
+    mpCost: 65,
+    bonuses: { hp: 2500, mp: 1000 },
+    regenRate: 300,
+    regenType: 'both',
+  },
+];
+
+export const KATYA_FUSIONS: FusionForm[] = [
+  {
+    id: 'trinity-light',
+    name: 'Триединство Света',
+    description: 'Слияние Небесного Дракона, Цилиня и Феникса Солнца. Непрерывное исцеление и щит от урона.',
+    requiredForms: ['dragon-sky', 'qilin', 'phoenix-sun'],
+    color: 'hsl(42 78% 65%)',
+    gradient: 'linear-gradient(135deg, hsl(42 78% 55%), hsl(120 55% 50%), hsl(25 90% 55%))',
+    emoji: '✨',
+    mpCost: 120,
+    bonuses: { hp: 5000, magic: 50, strength: 30 },
+    regenRate: 500,
+  },
+  {
+    id: 'trinity-shadow',
+    name: 'Триединство Теней',
+    description: 'Слияние Феникса Луны, Пустоши и Бури. Неуязвимость к магии, восстановление через поглощение атак.',
+    requiredForms: ['phoenix-moon', 'phoenix-void', 'phoenix-storm'],
+    color: 'hsl(270 60% 60%)',
+    gradient: 'linear-gradient(135deg, hsl(240 60% 55%), hsl(0 0% 40%), hsl(55 85% 50%))',
+    emoji: '🌑',
+    mpCost: 140,
+    bonuses: { mp: 5000, magic: 60, strength: 20 },
+    regenRate: 600,
+  },
+  {
+    id: 'full-ascension',
+    name: 'Полное Вознесение',
+    description: 'Объединение всех семи форм. Истинная сущность Кати — Первого из Небесных Драконов. Бессмертие на время трансформации.',
+    requiredForms: ['dragon-sky', 'qilin', 'phoenix-sun', 'phoenix-moon', 'phoenix-storm', 'phoenix-void', 'phoenix-life'],
+    color: 'hsl(42 78% 70%)',
+    gradient: 'linear-gradient(135deg, hsl(42 78% 58%), hsl(270 60% 55%), hsl(120 55% 50%), hsl(210 90% 60%), hsl(0 0% 50%))',
+    emoji: '🌟',
+    mpCost: 400,
+    bonuses: { hp: 9999, mp: 9000, magic: 99, strength: 99 },
+    regenRate: 999,
+    isUltimate: true,
+  },
+];
+
+export const CHILD_FUSIONS: Record<number, { name: string; emoji: string; color: string; description: string; mpCost: number; regenRate: number }> = {
+  1: { name: 'Владыка Небесных Стихий', emoji: '🌪️', color: 'hsl(180 65% 55%)', description: 'Слияние трёх форм Ярослава — неостановимая буря стихий', mpCost: 80, regenRate: 200 },
+  2: { name: 'Архонт Мёртвых', emoji: '💀', color: 'hsl(270 60% 55%)', description: 'Слияние трёх форм Мирона — повелитель жизни и смерти', mpCost: 90, regenRate: 180 },
+  3: { name: 'Вечный Феникс Жизни', emoji: '🌺', color: 'hsl(120 55% 45%)', description: 'Слияние трёх форм Светланы — возрождение бесконечно', mpCost: 75, regenRate: 250 },
+  4: { name: 'Кибер-Дракон Хаоса', emoji: '🤖', color: 'hsl(210 90% 60%)', description: 'Слияние трёх форм Кирилла — переписывает реальность', mpCost: 100, regenRate: 150 },
+  14: { name: 'Первозданный Огонь', emoji: '🔥', color: 'hsl(15 80% 55%)', description: 'Слияние трёх форм Тараса — пламя до начала времён', mpCost: 85, regenRate: 120 },
+  16: { name: 'Рыцарь Вечной Смерти', emoji: '⚔️', color: 'hsl(290 55% 55%)', description: 'Слияние трёх форм Руслана — непобедим в бою', mpCost: 95, regenRate: 100 },
+  21: { name: 'Великая Алхимик', emoji: '⚗️', color: 'hsl(280 65% 55%)', description: 'Слияние трёх форм Дарьи — трансформирует любую сущность', mpCost: 85, regenRate: 220 },
+};
+
 export const STATS = {
   name: 'Катя',
   title: 'Первый из Небесных Драконов',
