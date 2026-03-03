@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { OPENING_SCENES, STATS, type Scene, type SceneChoice } from '@/data/gameData';
+import TransformPanel from '@/components/TransformPanel';
 import Icon from '@/components/ui/icon';
 
 interface GameState {
@@ -9,6 +10,8 @@ interface GameState {
   gold: number;
   currentSceneId: string;
   history: { sceneTitle: string; choiceText: string; consequence: string }[];
+  isDead: boolean;
+  revivedCount: number;
 }
 
 const DIMENSION_LABELS: Record<string, { label: string; color: string }> = {
@@ -27,6 +30,13 @@ const MOOD_BG: Record<string, string> = {
   void: 'radial-gradient(ellipse at 50% 0%, hsl(0 0% 5% / 0.9), transparent 60%)',
 };
 
+interface FloatNumber {
+  id: number;
+  value: string;
+  color: string;
+  x: number;
+}
+
 export default function GamePage() {
   const [gameState, setGameState] = useState<GameState>({
     hp: STATS.hp,
@@ -35,25 +45,104 @@ export default function GamePage() {
     gold: STATS.gold,
     currentSceneId: 'scene-balcony',
     history: [],
+    isDead: false,
+    revivedCount: 0,
   });
   const [lastConsequence, setLastConsequence] = useState<string | null>(null);
   const [chosenChoice, setChosenChoice] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [activeFormId, setActiveFormId] = useState<string | null>(null);
+  const [floatNumbers, setFloatNumbers] = useState<FloatNumber[]>([]);
+  const [deathScreen, setDeathScreen] = useState(false);
+  const [reviveAnim, setReviveAnim] = useState(false);
+  const floatIdRef = useRef(0);
 
   const currentScene: Scene = OPENING_SCENES.find(s => s.id === gameState.currentSceneId) || OPENING_SCENES[0];
   const dimInfo = DIMENSION_LABELS[currentScene.dimension] || DIMENSION_LABELS.neutral;
 
+  const addFloat = (value: string, color: string) => {
+    const id = ++floatIdRef.current;
+    const x = 30 + Math.random() * 40;
+    setFloatNumbers(prev => [...prev, { id, value, color, x }]);
+    setTimeout(() => setFloatNumbers(prev => prev.filter(f => f.id !== id)), 1500);
+  };
+
+  const handleDeath = () => {
+    setDeathScreen(true);
+    setTimeout(() => {
+      setReviveAnim(true);
+      setTimeout(() => {
+        const revivedHp = Math.round(STATS.maxHp * 0.5);
+        setGameState(prev => ({
+          ...prev,
+          hp: revivedHp,
+          isDead: false,
+          revivedCount: prev.revivedCount + 1,
+        }));
+        setDeathScreen(false);
+        setReviveAnim(false);
+        addFloat(`+${revivedHp} Возрождение!`, 'hsl(25 90% 65%)');
+      }, 1500);
+    }, 2500);
+  };
+
+  const handleTransform = (mpCost: number, hpBonus: number, mpBonus: number, formName: string, regenRate: number, regenType: 'hp' | 'mp' | 'both') => {
+    setGameState(prev => {
+      const newMp = Math.max(0, prev.mp - mpCost);
+      const newHp = Math.min(STATS.maxHp, prev.hp + hpBonus);
+      const newMpFinal = Math.min(STATS.maxMp, newMp + mpBonus);
+      if (hpBonus > 0) addFloat(`+${hpBonus} HP`, 'hsl(120 55% 55%)');
+      if (mpBonus > 0) addFloat(`+${mpBonus} MP`, 'hsl(220 80% 65%)');
+      return { ...prev, hp: newHp, mp: newMpFinal };
+    });
+    setActiveFormId(formName);
+  };
+
+  const handleRegenTick = (hpGain: number, mpGain: number) => {
+    setGameState(prev => {
+      if (prev.isDead) return prev;
+      const newHp = Math.min(STATS.maxHp, prev.hp + hpGain);
+      const newMp = Math.min(STATS.maxMp, prev.mp + mpGain);
+      if (hpGain > 0 && prev.hp < STATS.maxHp) addFloat(`+${hpGain}`, 'hsl(0 70% 60%)');
+      if (mpGain > 0 && prev.mp < STATS.maxMp) addFloat(`+${mpGain}`, 'hsl(220 80% 65%)');
+      return { ...prev, hp: newHp, mp: newMp };
+    });
+  };
+
+  const handleFormEnd = () => {
+    setActiveFormId(null);
+  };
+
+  useEffect(() => {
+    if (gameState.hp <= 0 && !gameState.isDead && !deathScreen) {
+      setGameState(prev => ({ ...prev, isDead: true }));
+      handleDeath();
+    }
+  }, [gameState.hp]);
+
   const handleChoice = (choice: SceneChoice) => {
-    if (isTransitioning || chosenChoice) return;
+    if (isTransitioning || chosenChoice || gameState.isDead) return;
     setChosenChoice(choice.id);
     setLastConsequence(choice.consequence || null);
 
     const newState = { ...gameState };
     if (choice.effect) {
-      if (choice.effect.hp) newState.hp = Math.max(0, Math.min(STATS.maxHp, newState.hp + choice.effect.hp));
-      if (choice.effect.mp) newState.mp = Math.max(0, Math.min(STATS.maxMp, newState.mp + choice.effect.mp));
-      if (choice.effect.xp) newState.xp += choice.effect.xp;
-      if (choice.effect.gold) newState.gold += choice.effect.gold;
+      if (choice.effect.hp) {
+        newState.hp = Math.max(0, Math.min(STATS.maxHp, newState.hp + choice.effect.hp));
+        addFloat(`${choice.effect.hp > 0 ? '+' : ''}${choice.effect.hp} HP`, choice.effect.hp > 0 ? 'hsl(120 55% 55%)' : 'hsl(0 70% 55%)');
+      }
+      if (choice.effect.mp) {
+        newState.mp = Math.max(0, Math.min(STATS.maxMp, newState.mp + choice.effect.mp));
+        addFloat(`${choice.effect.mp > 0 ? '+' : ''}${choice.effect.mp} MP`, choice.effect.mp > 0 ? 'hsl(220 80% 65%)' : 'hsl(270 60% 55%)');
+      }
+      if (choice.effect.xp) {
+        newState.xp += choice.effect.xp;
+        addFloat(`+${choice.effect.xp} XP`, 'hsl(42 78% 65%)');
+      }
+      if (choice.effect.gold) {
+        newState.gold += choice.effect.gold;
+        addFloat(`+${choice.effect.gold}🪙`, 'hsl(42 78% 65%)');
+      }
     }
 
     newState.history = [
@@ -73,46 +162,122 @@ export default function GamePage() {
     }, 1800);
   };
 
+  const hpPercent = (gameState.hp / STATS.maxHp) * 100;
+  const mpPercent = (gameState.mp / STATS.maxMp) * 100;
+  const xpPercent = ((gameState.xp - STATS.xp) / (STATS.nextLevelXp - STATS.xp) + 1) * 50;
+
   return (
     <div className="min-h-screen labyrinth-bg relative" style={{ backgroundImage: MOOD_BG[currentScene.backgroundMood || 'mystical'] }}>
 
+      {/* Плавающие числа урона/восстановления */}
+      <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden">
+        {floatNumbers.map(f => (
+          <div key={f.id}
+            className="absolute text-sm font-bold"
+            style={{
+              top: '15%',
+              left: `${f.x}%`,
+              color: f.color,
+              fontFamily: 'Cormorant Garamond, serif',
+              fontSize: '16px',
+              textShadow: `0 0 10px ${f.color}`,
+              animation: 'float-up 1.5s ease-out forwards',
+            }}>
+            {f.value}
+          </div>
+        ))}
+      </div>
+
+      {/* Экран смерти и воскрешения */}
+      {deathScreen && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+          style={{ background: 'hsl(0 0% 3% / 0.97)' }}>
+          {!reviveAnim ? (
+            <div className="text-center animate-fade-in">
+              <div className="text-6xl mb-4 animate-pulse">🔥</div>
+              <h2 className="text-3xl text-glow-gold mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                Катя пала в бою
+              </h2>
+              <p className="text-sm opacity-50 italic" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                Но Феникс не умирает дважды...
+              </p>
+              <div className="mt-6 flex gap-1 justify-center">
+                {[0, 1, 2].map(i => (
+                  <div key={i} className="w-2 h-2 rounded-full animate-pulse-glow"
+                    style={{ background: 'hsl(25 90% 55%)', animationDelay: `${i * 0.3}s` }} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center animate-scale-in">
+              <div className="text-7xl mb-4">✨</div>
+              <h2 className="text-4xl text-glow-gold mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                Возрождение
+              </h2>
+              <p className="text-sm" style={{ color: 'hsl(25 90% 65%)', fontFamily: 'Cormorant Garamond, serif' }}>
+                Феникс восстаёт из пепла
+              </p>
+              {gameState.revivedCount > 0 && (
+                <p className="text-xs opacity-30 mt-2">Возрождений: {gameState.revivedCount + 1}</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* HUD статус */}
       <div className="sticky top-0 z-20 glass border-b border-border px-4 py-2">
-        <div className="max-w-3xl mx-auto flex items-center gap-4">
-          <div className="flex items-center gap-2 flex-1">
-            <span className="text-xs opacity-40 hidden sm:block">❤</span>
-            <div className="hp-bar flex-1 max-w-24">
-              <div className="hp-bar-fill" style={{ width: `${(gameState.hp / STATS.maxHp) * 100}%` }} />
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center gap-3 mb-1.5">
+            {/* HP */}
+            <div className="flex items-center gap-1.5 flex-1">
+              <span className="text-xs" style={{ color: 'hsl(0 75% 60%)' }}>❤</span>
+              <div className="hp-bar flex-1">
+                <div className="hp-bar-fill transition-all duration-500"
+                  style={{ width: `${hpPercent}%`, opacity: hpPercent < 20 ? '0.6' : '1' }} />
+              </div>
+              <span className="text-xs w-14 text-right" style={{ color: 'hsl(0 75% 60%)', fontSize: '11px' }}>
+                {gameState.hp}
+              </span>
             </div>
-            <span className="text-xs opacity-60" style={{ color: 'hsl(0 75% 60%)' }}>{gameState.hp}</span>
-          </div>
-          <div className="flex items-center gap-2 flex-1">
-            <span className="text-xs opacity-40 hidden sm:block">◈</span>
-            <div className="hp-bar flex-1 max-w-24">
-              <div className="mp-bar-fill" style={{ width: `${(gameState.mp / STATS.maxMp) * 100}%` }} />
+            {/* MP */}
+            <div className="flex items-center gap-1.5 flex-1">
+              <span className="text-xs" style={{ color: 'hsl(220 80% 65%)' }}>◈</span>
+              <div className="hp-bar flex-1">
+                <div className="mp-bar-fill transition-all duration-500" style={{ width: `${mpPercent}%` }} />
+              </div>
+              <span className="text-xs w-14 text-right" style={{ color: 'hsl(220 80% 65%)', fontSize: '11px' }}>
+                {gameState.mp}
+              </span>
             </div>
-            <span className="text-xs opacity-60" style={{ color: 'hsl(220 80% 65%)' }}>{gameState.mp}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Icon name="Star" size={12} style={{ color: 'hsl(42 78% 58%)' }} />
-            <span className="text-xs" style={{ color: 'hsl(42 78% 58%)' }}>{gameState.xp.toLocaleString()} XP</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-xs">🪙</span>
-            <span className="text-xs opacity-60">{gameState.gold}</span>
+          <div className="flex items-center gap-4">
+            {/* XP */}
+            <div className="flex items-center gap-1.5 flex-1">
+              <span className="text-xs opacity-30">XP</span>
+              <div className="hp-bar flex-1">
+                <div className="xp-bar-fill transition-all duration-500" style={{ width: `${Math.min(100, xpPercent)}%` }} />
+              </div>
+            </div>
+            <div className="flex items-center gap-3 text-xs opacity-50">
+              <span>🪙 {gameState.gold}</span>
+              {activeFormId && (
+                <span style={{ color: 'hsl(42 78% 65%)' }}>✦ {activeFormId}</span>
+              )}
+              {gameState.revivedCount > 0 && (
+                <span style={{ color: 'hsl(25 90% 60%)' }}>🔥×{gameState.revivedCount}</span>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className={`max-w-3xl mx-auto px-4 py-8 transition-opacity duration-400 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+      <div className={`max-w-3xl mx-auto px-4 py-8 pb-28 transition-opacity duration-400 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
 
         {/* Измерение и заголовок сцены */}
         <div className="mb-6 animate-fade-in">
           <div className="flex items-center gap-3 mb-3">
-            <span
-              className="badge-dimension text-xs"
-              style={{ color: dimInfo.color, borderColor: dimInfo.color + '50' }}
-            >
+            <span className="badge-dimension text-xs" style={{ color: dimInfo.color, borderColor: dimInfo.color + '50' }}>
               {dimInfo.label}
             </span>
             <div className="ornament-divider flex-1" style={{ color: dimInfo.color + '40' }}>
@@ -150,7 +315,7 @@ export default function GamePage() {
         )}
 
         {/* Выборы */}
-        {!chosenChoice && (
+        {!chosenChoice && !gameState.isDead && (
           <div className="space-y-3 animate-fade-in">
             <p className="text-xs opacity-30 mb-4 tracking-widest uppercase" style={{ fontFamily: 'Golos Text, sans-serif' }}>
               Выберите действие
@@ -169,9 +334,9 @@ export default function GamePage() {
                 )}
                 {choice.effect && (
                   <span className="float-right text-xs opacity-30 ml-4">
-                    {choice.effect.xp && `+${choice.effect.xp} XP`}
-                    {choice.effect.mp && choice.effect.mp < 0 && ` ${choice.effect.mp} MP`}
-                    {choice.effect.hp && choice.effect.hp < 0 && ` ${choice.effect.hp} HP`}
+                    {choice.effect.xp ? `+${choice.effect.xp} XP ` : ''}
+                    {choice.effect.mp && choice.effect.mp < 0 ? `${choice.effect.mp} MP ` : ''}
+                    {choice.effect.hp && choice.effect.hp < 0 ? `${choice.effect.hp} HP ` : ''}
                   </span>
                 )}
               </button>
@@ -185,7 +350,7 @@ export default function GamePage() {
           </div>
         )}
 
-        {/* История переходов */}
+        {/* Хроника */}
         {gameState.history.length > 0 && (
           <div className="mt-10">
             <div className="ornament-divider mb-4">
@@ -193,8 +358,8 @@ export default function GamePage() {
             </div>
             <div className="space-y-2">
               {gameState.history.slice(0, 5).map((entry, i) => (
-                <div key={i} className="text-xs opacity-30 flex gap-2" style={{ fontFamily: 'Golos Text, sans-serif' }}>
-                  <span className="text-gold opacity-50">◆</span>
+                <div key={i} className="text-xs opacity-30 flex gap-2">
+                  <span style={{ color: 'hsl(42 78% 58%)', opacity: 0.5 }}>◆</span>
                   <div>
                     <span className="opacity-50">{entry.sceneTitle}:</span> {entry.choiceText}
                   </div>
@@ -204,6 +369,25 @@ export default function GamePage() {
           </div>
         )}
       </div>
+
+      {/* Панель трансформации */}
+      <TransformPanel
+        hp={gameState.hp}
+        mp={gameState.mp}
+        maxHp={STATS.maxHp}
+        maxMp={STATS.maxMp}
+        onTransform={handleTransform}
+        onRegenTick={handleRegenTick}
+        activeFormId={activeFormId}
+        onFormEnd={handleFormEnd}
+      />
+
+      <style>{`
+        @keyframes float-up {
+          0% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-50px); }
+        }
+      `}</style>
     </div>
   );
 }
